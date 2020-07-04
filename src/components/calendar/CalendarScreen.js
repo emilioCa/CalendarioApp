@@ -1,45 +1,37 @@
-import React, {useState} from "react";
-import {useDispatch, useSelector} from 'react-redux';
-import {Calendar, momentLocalizer} from 'react-big-calendar';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from 'react-redux';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 
-import {Navbar} from "../ui/Navbar";
-import {AddNewFab} from '../ui/AddNewFab'
-import {CalendarEvent} from "./CalendarEvent";
-import {CalendarModal} from "./CalendarModal";
-import {DeleteEventFab} from "../ui/DeleteEventFab";
-import {messages} from "../../helpers/calendar-messages-es";
+import { Navbar } from "../ui/Navbar";
+import { AddNewFab } from '../ui/AddNewFab'
+import { CalendarEvent } from "./CalendarEvent";
+import { CalendarModal } from "./CalendarModal";
+import { DeleteEventFab } from "../ui/DeleteEventFab";
+import { messages } from "../../helpers/calendar-messages-es";
 
 // Cargamos los css necesarios para Big Calendar
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 // Cargamos el idioma de moment
 import 'moment/locale/es';
 // Acciones
-import {uiOpenModal} from "../../actions/ui";
-import {eventClearActiveEvent, eventSetActive} from '../../actions/events';
+import { uiOpenModal } from "../../actions/ui";
+import { eventClearActiveEvent, eventSetActive, eventStartLoading } from '../../actions/events';
 
 moment.locale('es'); // Cambiamos a español
 const localizer = momentLocalizer(moment); // or globalizeLocalizer
 
-// Creamos arreglo con objetos que contienen los eventos de prueba
-// const eventsTest = [{
-//     title: 'Cumpleaños Nicky',
-//     start: moment().toDate(), // es como crear un new Date
-//     end: moment().add(2, 'hours').toDate(), // añade dos horas
-//     bgcolor: '#fafafa',
-//     notes: 'Comprar un pastel y bañar a la perrita',
-//     user: {
-//         _id: '1234',
-//         name: 'Emilio'
-//     }
-// }];
-
 export const CalendarScreen = () => {
     // Nos permite hacer el envío de una acción
     const dispatch = useDispatch();
-    const {events, activeEvent} = useSelector(state => state.calendar);
+    const { events, activeEvent } = useSelector(state => state.calendar);
+    const { uid } = useSelector(state => state.auth);
 
-    const [lastView, setLastView] = useState(localStorage.getItem('lastView') || 'month')
+    const [lastView, setLastView] = useState(localStorage.getItem('lastView') || 'month');
+
+    useEffect(() => {
+        dispatch(eventStartLoading());
+    }, [dispatch])
 
     // Cada vez que se haga doble click
     const onDoubleClick = (e) => {
@@ -67,7 +59,7 @@ export const CalendarScreen = () => {
     // Aplicará un estilo a un evento en particular
     const eventStyleGetter = (event, start, end, isSelected) => {
         const style = {
-            backgroundColor: '#367CF7',
+            backgroundColor: (uid === event.user._id) ? '#367CF7' : '#465660',
             borderRadius: '0px',
             opacity: 0.8,
             display: 'block',
@@ -80,7 +72,7 @@ export const CalendarScreen = () => {
 
     return (
         <div className="calendar-screen">
-            <Navbar/>
+            <Navbar />
 
             <Calendar
                 localizer={localizer}
@@ -99,11 +91,11 @@ export const CalendarScreen = () => {
                     event: CalendarEvent
                 }}
             />
-            <AddNewFab/>
+            <AddNewFab />
             {
-                (activeEvent) && <DeleteEventFab/>
+                (activeEvent) && <DeleteEventFab />
             }
-            <CalendarModal/>
+            <CalendarModal />
         </div>
     );
 }

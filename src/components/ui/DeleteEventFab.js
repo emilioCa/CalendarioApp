@@ -1,7 +1,7 @@
 import React from "react";
-import {useDispatch} from "react-redux";
+import { useDispatch } from "react-redux";
 
-import {eventDeleted} from "../../actions/events";
+import { eventStartDelete } from "../../actions/events";
 
 export const DeleteEventFab = () => {
     const dispatch = useDispatch();
@@ -9,10 +9,11 @@ export const DeleteEventFab = () => {
 
     const handleDelete = () => {
         // Le enviamos el evento activo o seleccionado para su eliminación
-        dispatch(eventDeleted());
+        dispatch(eventStartDelete());
     }
     return (
         <button
+            id="btnDelete"
             className="btn btn-danger fab-danger"
             onClick={handleDelete}
         >

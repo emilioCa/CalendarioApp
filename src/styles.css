@@ -79,3 +79,7 @@ html, body {
     position: fixed;
     left: 25px;
 }
+
+#btnDelete {
+    transition: 2s ease;
+}

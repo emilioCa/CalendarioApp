@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from "react";
-import {useSelector, useDispatch} from 'react-redux';
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from 'react-redux';
 import moment from 'moment';
 
 import Modal from 'react-modal';
 import DateTimePicker from "react-datetime-picker";
 import Swal from "sweetalert2";
 
-import {uiCloseModal} from "../../actions/ui";
-import {eventAddNew, eventClearActiveEvent, eventUpdated} from "../../actions/events";
+import { uiCloseModal } from "../../actions/ui";
+import { eventStartAddNew, eventClearActiveEvent, eventStartUpdate } from "../../actions/events";
 
 const customStyles = {
     content: {
@@ -35,9 +35,9 @@ const initEvent = {
 
 export const CalendarModal = () => {
     // Estamos pendiente de los cambios del estado de la app
-    const {modalOpen} = useSelector(state => state.ui);
-    const {activeEvent} = useSelector(state => state.calendar);
-    // Hacemos el dispatch de una acción
+    const { modalOpen } = useSelector(state => state.ui);
+    const { activeEvent } = useSelector(state => state.calendar);
+    
     const dispatch = useDispatch();
 
     const [dateStart, setDateStart] = useState(now.toDate());
@@ -45,17 +45,17 @@ export const CalendarModal = () => {
     const [titleValid, setTitleValid] = useState(true);
 
     const [formValues, setFormValues] = useState(initEvent);
-    const {notes, title, start, end} = formValues;
+    const { notes, title, start, end } = formValues;
 
     useEffect(() => {
         if (activeEvent) {
             setFormValues(activeEvent);
-        } else{
+        } else {
             setFormValues(initEvent);
         }
     }, [activeEvent, setFormValues])
 
-    const handleInputChange = ({target}) => {
+    const handleInputChange = ({ target }) => {
         setFormValues({
             ...formValues,
             [target.name]: target.value // computamos el nombre
@@ -98,20 +98,12 @@ export const CalendarModal = () => {
         if (title.trim().length < 2) {
             return setTitleValid(false);
         }
-
         // Si el evento está activo actualiza
         if (activeEvent) {
-            dispatch(eventUpdated(formValues));
+            dispatch(eventStartUpdate(formValues));
         } else {
-            console.log(formValues.start + ' ' + formValues.end)
-            dispatch(eventAddNew({
-                ...formValues,
-                id: new Date().getTime(),
-                user: {
-                    __id: '2345',
-                    name: 'Emilio'
-                }
-            }));
+            // console.log(formValues.start + ' ' + formValues.end)
+            dispatch(eventStartAddNew(formValues))
 
         }
         setTitleValid(true);
@@ -130,7 +122,7 @@ export const CalendarModal = () => {
             contentLabel="Example Modal"
         >
             <h1>{(activeEvent) ? 'Editar evento' : 'Crear evento'}</h1>
-            <hr/>
+            <hr />
             <form
                 className="container"
                 onSubmit={handleSubmitForm}
@@ -155,7 +147,7 @@ export const CalendarModal = () => {
                     />
                 </div>
 
-                <hr/>
+                <hr />
                 <div className="form-group">
                     <label>Titulo y notas</label>
                     <input
@@ -171,15 +163,15 @@ export const CalendarModal = () => {
                 </div>
 
                 <div className="form-group">
-        <textarea
-            type="text"
-            className="form-control"
-            placeholder="Notas"
-            rows="5"
-            name="notes"
-            value={notes}
-            onChange={handleInputChange}
-        ></textarea>
+                    <textarea
+                        type="text"
+                        className="form-control"
+                        placeholder="Notas"
+                        rows="5"
+                        name="notes"
+                        value={notes}
+                        onChange={handleInputChange}
+                    ></textarea>
                     <small id="emailHelp" className="form-text text-muted">Información adicional</small>
                 </div>
 
